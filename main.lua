@@ -8,11 +8,23 @@ function love.load()
     xSize = love.graphics.getWidth() / cellSize
     ySize = love.graphics.getHeight() / cellSize
     love.graphics.setBackgroundColor(255, 255, 255, 255)
+
+    grid = {}
+    for x = 1, xSize do
+        grid[x] = {}
+        for y = 1, ySize do
+            grid[x][y] = false
+        end
+    end
 end
 
 function love.update()
     selectedX = math.floor(love.mouse.getX() / cellSize) + 1
     selectedY = math.floor(love.mouse.getY() / cellSize) + 1
+
+    if love.mouse.isDown(1) then
+        grid[selectedX][selectedY] = true
+    end
 end
 
 function love.draw()
@@ -20,6 +32,8 @@ function love.draw()
         for y = 1, ySize do
             if x == selectedX and y == selectedY then
                 love.graphics.setColor(0, 255, 255)
+            elseif grid[x][y] then
+                love.graphics.setColor(255, 0, 255)
             else
                 love.graphics.setColor(220, 220, 220)
             end
