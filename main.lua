@@ -22,7 +22,7 @@ function love.update()
     selectedX = math.floor(love.mouse.getX() / cellSize) + 1
     selectedY = math.floor(love.mouse.getY() / cellSize) + 1
 
-    if love.mouse.isDown(1) and selectedX <= gridXCount and selectedY <= gridYCount then
+    if love.mouse.isDown(1) and selectedX <= xSize and selectedY <= ySize then
         grid[selectedX][selectedY] = true
     end
 end
@@ -46,11 +46,21 @@ end
 
 function love.keypressed()
     local nextGrid = {}
-    
+
     for x = 1, xSize do
         nextGrid[x] = {}
         for y = 1, ySize do
-            nextGrid[x][y] = true
+            local neighbourCount = 0
+
+            for dx = -1, 1 do
+                for dy = -1, 1 do
+                    if not (dx == 0 and dy == 0) and grid[x + dx] and grid[x + dx][y + dy] then
+                        neighbourCount = neighbourCount + 1
+                    end
+                end
+            end
+
+            nextGrid[x][y] = neighbourCount == 3 or (grid[x][y] and neighbourCount == 2)
         end
     end
 
