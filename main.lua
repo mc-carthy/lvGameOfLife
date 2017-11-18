@@ -8,6 +8,7 @@ function love.load()
     xSize = love.graphics.getWidth() / cellSize
     ySize = love.graphics.getHeight() / cellSize
     love.graphics.setBackgroundColor(255, 255, 255, 255)
+    love.keyboard.setKeyRepeat(true)
 
     grid = {}
     for x = 1, xSize do
