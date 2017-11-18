@@ -7,16 +7,25 @@ local cellDrawSize = cellSize - border
 function love.load()
     xSize = love.graphics.getWidth() / cellSize
     ySize = love.graphics.getHeight() / cellSize
+    love.graphics.setBackgroundColor(255, 255, 255, 255)
 end
 
 function love.update()
-
+    selectedX = math.floor(love.mouse.getX() / cellSize) + 1
+    selectedY = math.floor(love.mouse.getY() / cellSize) + 1
 end
 
 function love.draw()
     for x = 1, xSize do
         for y = 1, ySize do
+            if x == selectedX and y == selectedY then
+                love.graphics.setColor(0, 255, 255)
+            else
+                love.graphics.setColor(220, 220, 220)
+            end
             love.graphics.rectangle('fill', (x - 1) * cellSize, (y - 1) * cellSize, cellDrawSize, cellDrawSize)
         end
     end
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.print('selected x: ' .. selectedX .. ', selected y: ' .. selectedY)
 end
