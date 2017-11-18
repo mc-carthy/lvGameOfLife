@@ -24,6 +24,8 @@ function love.update()
 
     if love.mouse.isDown(1) and selectedX <= xSize and selectedY <= ySize then
         grid[selectedX][selectedY] = true
+    elseif love.mouse.isDown(2) and selectedX <= xSize and selectedY <= ySize then
+        grid[selectedX][selectedY] = false
     end
 end
 
