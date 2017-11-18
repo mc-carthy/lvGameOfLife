@@ -22,7 +22,7 @@ function love.update()
     selectedX = math.floor(love.mouse.getX() / cellSize) + 1
     selectedY = math.floor(love.mouse.getY() / cellSize) + 1
 
-    if love.mouse.isDown(1) then
+    if love.mouse.isDown(1) and selectedX <= gridXCount and selectedY <= gridYCount then
         grid[selectedX][selectedY] = true
     end
 end
@@ -42,4 +42,17 @@ function love.draw()
     end
     love.graphics.setColor(0, 0, 0)
     love.graphics.print('selected x: ' .. selectedX .. ', selected y: ' .. selectedY)
+end
+
+function love.keypressed()
+    local nextGrid = {}
+    
+    for x = 1, xSize do
+        nextGrid[x] = {}
+        for y = 1, ySize do
+            nextGrid[x][y] = true
+        end
+    end
+
+    grid = nextGrid
 end
