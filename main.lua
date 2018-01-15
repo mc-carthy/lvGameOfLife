@@ -3,6 +3,11 @@ local ySize
 local cellSize = 5
 local border = 1
 local cellDrawSize = cellSize - border
+local wallChance = 35
+local mapBorderThickness = 0
+local dungeonGen = true
+
+local rng = love.math.newRandomGenerator(os.time())
 
 function love.load()
     xSize = love.graphics.getWidth() / cellSize
@@ -14,7 +19,24 @@ function love.load()
     for x = 1, xSize do
         grid[x] = {}
         for y = 1, ySize do
-            grid[x][y] = false
+            if dungeonGen then
+                if rng:random(100) >= wallChance then
+                    grid[x][y] = false
+                else
+                    grid[x][y] = true
+                end
+
+                if x <= mapBorderThickness or x >= xSize - mapBorderThickness then
+                    grid[x][y] = true
+                end
+
+                if y <= mapBorderThickness or y >= ySize - mapBorderThickness then
+                    grid[x][y] = true
+                end
+            else
+                grid[x][y] = false
+            end
+
         end
     end
 end
@@ -60,10 +82,34 @@ function love.keypressed()
                     if not (dx == 0 and dy == 0) and grid[x + dx] and grid[x + dx][y + dy] then
                         neighbourCount = neighbourCount + 1
                     end
+
+                    if dungeonGen then
+                        if grid[x + dx] == nil then
+                            neighbourCount = neighbourCount + 1
+                        elseif grid[x + dx][y + dy] == nil then
+                            neighbourCount = neighbourCount + 1
+                        end
+                    end
                 end
             end
 
-            nextGrid[x][y] = neighbourCount == 3 or (grid[x][y] and neighbourCount == 2)
+            if dungeonGen then
+                if x <= mapBorderThickness or x >= xSize - mapBorderThickness then
+                    grid[x][y] = true
+                end
+
+                if y <= mapBorderThickness or y >= ySize - mapBorderThickness then
+                    grid[x][y] = true
+                end
+
+                if neighbourCount > 4 then
+                    nextGrid[x][y] = true
+                elseif neighbourCount < 4 then
+                    nextGrid[x][y] = false
+                end
+            else
+                nextGrid[x][y] = neighbourCount == 3 or (grid[x][y] and neighbourCount == 2)
+            end
         end
     end
 
