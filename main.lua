@@ -1,11 +1,13 @@
+local CelAut = require("src.CellularAutomata")
+
 local xSize
 local ySize
 local cellSize = 5
 local border = 1
 local cellDrawSize = cellSize - border
-local wallChance = 35
-local mapBorderThickness = 0
-local dungeonGen = true
+local wallChance = 480
+local mapBorderThickness = 2
+local caveGen = true
 
 local rng = love.math.newRandomGenerator(os.time())
 
@@ -15,28 +17,14 @@ function love.load()
     love.graphics.setBackgroundColor(255, 255, 255, 255)
     love.keyboard.setKeyRepeat(true)
 
-    grid = {}
-    for x = 1, xSize do
-        grid[x] = {}
-        for y = 1, ySize do
-            if dungeonGen then
-                if rng:random(100) >= wallChance then
-                    grid[x][y] = false
-                else
-                    grid[x][y] = true
-                end
-
-                if x <= mapBorderThickness or x >= xSize - mapBorderThickness then
-                    grid[x][y] = true
-                end
-
-                if y <= mapBorderThickness or y >= ySize - mapBorderThickness then
-                    grid[x][y] = true
-                end
-            else
+    if caveGen then
+        createCave()
+    else
+        for x = 1, xSize do
+            grid[x] = {}
+            for y = 1, ySize do
                 grid[x][y] = false
             end
-
         end
     end
 end
@@ -69,49 +57,47 @@ function love.draw()
     love.graphics.print('selected x: ' .. selectedX .. ', selected y: ' .. selectedY)
 end
 
-function love.keypressed()
-    local nextGrid = {}
+function love.keypressed(key)
+    if key == "escape" then
+        love.event.quit()
+    end
 
-    for x = 1, xSize do
-        nextGrid[x] = {}
-        for y = 1, ySize do
-            local neighbourCount = 0
+    if key == "r" and caveGen then
+        createCave()
+    end
+    
+    if not caveGen then
+        local nextGrid = {}
 
-            for dx = -1, 1 do
-                for dy = -1, 1 do
-                    if not (dx == 0 and dy == 0) and grid[x + dx] and grid[x + dx][y + dy] then
-                        neighbourCount = neighbourCount + 1
-                    end
+        for x = 1, xSize do
+            nextGrid[x] = {}
+            for y = 1, ySize do
+                local neighbourCount = 0
 
-                    if dungeonGen then
-                        if grid[x + dx] == nil then
+                for dx = -1, 1 do
+                    for dy = -1, 1 do
+                        if not (dx == 0 and dy == 0) and grid[x + dx] and grid[x + dx][y + dy] then
                             neighbourCount = neighbourCount + 1
-                        elseif grid[x + dx][y + dy] == nil then
-                            neighbourCount = neighbourCount + 1
+                        end
+
+                        if caveGen then
+                            if grid[x + dx] == nil then
+                                neighbourCount = neighbourCount + 1
+                            elseif grid[x + dx][y + dy] == nil then
+                                neighbourCount = neighbourCount + 1
+                            end
                         end
                     end
                 end
-            end
-
-            if dungeonGen then
-                if x <= mapBorderThickness or x >= xSize - mapBorderThickness then
-                    grid[x][y] = true
-                end
-
-                if y <= mapBorderThickness or y >= ySize - mapBorderThickness then
-                    grid[x][y] = true
-                end
-
-                if neighbourCount > 4 then
-                    nextGrid[x][y] = true
-                elseif neighbourCount < 4 then
-                    nextGrid[x][y] = false
-                end
-            else
                 nextGrid[x][y] = neighbourCount == 3 or (grid[x][y] and neighbourCount == 2)
             end
         end
-    end
 
-    grid = nextGrid
+        grid = nextGrid
+    end
+end
+
+function createCave()
+    celAut = CelAut.create(xSize, ySize, wallChance)
+    grid = celAut.grid
 end
