@@ -1,4 +1,4 @@
-local CelAut = require("src.CellularAutomata")
+local CelAut = require("src.CelAutCaveGen")
 
 local xSize
 local ySize
@@ -6,7 +6,6 @@ local cellSize = 5
 local border = 1
 local cellDrawSize = cellSize - border
 local wallChance = 480
-local mapBorderThickness = 2
 local caveGen = true
 
 local rng = love.math.newRandomGenerator(os.time())
@@ -20,6 +19,7 @@ function love.load()
     if caveGen then
         createCave()
     else
+        grid = {}
         for x = 1, xSize do
             grid[x] = {}
             for y = 1, ySize do
@@ -62,11 +62,9 @@ function love.keypressed(key)
         love.event.quit()
     end
 
-    if key == "r" and caveGen then
+    if caveGen then
         createCave()
-    end
-    
-    if not caveGen then
+    else
         local nextGrid = {}
 
         for x = 1, xSize do
@@ -98,6 +96,6 @@ function love.keypressed(key)
 end
 
 function createCave()
-    celAut = CelAut.create(xSize, ySize, wallChance)
+    celAut = CelAut.create(xSize, ySize)
     grid = celAut.grid
 end
